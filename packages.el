@@ -47,3 +47,10 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
+
+(package! cnfonts)
+(package! color-rg)
+(package! rime)
+
+;; 彩虹猫
+(package! nyan-mode :recipe (:host github :repo "TeMPOraL/nyan-mode"))
