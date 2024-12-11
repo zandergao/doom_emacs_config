@@ -91,3 +91,4 @@
 (use-package init-org)
 (use-package init-input)
 (use-package init-keybinding)
+(use-package init-sdcv)

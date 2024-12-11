@@ -54,3 +54,7 @@
 
 ;; 彩虹猫
 (package! nyan-mode :recipe (:host github :repo "TeMPOraL/nyan-mode"))
+
+;; 翻译插件
+(package! sdcv
+  :recipe (:host github :repo "manateelazycat/sdcv"))
