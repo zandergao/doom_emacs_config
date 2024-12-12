@@ -8,6 +8,7 @@
 
 ;; 彩虹猫 UI
 (use-package! nyan-mode
+  :hook (after-init . nyan-mode)
   :config
   (setq nyan-animate-nyancat t
         nyan-wavy-trail t

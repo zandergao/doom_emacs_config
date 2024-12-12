@@ -58,3 +58,10 @@
 ;; 翻译插件
 (package! sdcv
   :recipe (:host github :repo "manateelazycat/sdcv"))
+
+;; 中英文字符之间自动插入空格, 增加可阅读性
+(package! pangu-spacing)
+
+(unless (display-graphic-p)
+  (package! solaire-mode :disable t) ;; 使非文件访问缓冲区更暗，tty 终端模式下看不清需要去掉
+  )
