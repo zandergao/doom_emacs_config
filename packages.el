@@ -49,7 +49,8 @@
 ;; (unpin! t)
 
 (package! cnfonts)
-(package! color-rg)
+(package! color-rg :recipe (:host github :repo "manateelazycat/color-rg"))
+
 (package! rime)
 
 ;; 彩虹猫
@@ -65,3 +66,8 @@
 (unless (display-graphic-p)
   (package! solaire-mode :disable t) ;; 使非文件访问缓冲区更暗，tty 终端模式下看不清需要去掉
   )
+
+(package! dts-mode)
+
+(package! org-bars
+  :recipe (:host github :repo "tonyaldon/org-bars"))
