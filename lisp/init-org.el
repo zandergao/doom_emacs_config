@@ -4,10 +4,16 @@
 (require 'org-bars)
 (add-hook 'org-mode-hook #'org-bars-mode)
 
-;; 在 Source Block 中像在语言 mode 中一样的缩进
-(after! org
+(use-package! org
+  :config
+  (setq org-hide-emphasis-markers t) ;; 不显示强调符
+  ;; 启用自动显示图片
+  (setq org-startup-with-inline-images t)
+  (add-hook 'org-mode-hook #'org-display-inline-images)
+  ;; 在 Source Block 中像在语言 mode 中一样的缩进
   (setq org-src-tab-acts-natively t)
-  (setq org-src-preserve-indentation nil))
+  (setq org-src-preserve-indentation nil)
+  )
 
 (use-package! pangu-spacing
   :hook (org-mode . pangu-spacing-mode)  ;; 仅在 org-mode 中启用 pangu-spacing
@@ -27,3 +33,4 @@
   )
 
 (provide 'init-org)
+;;; init-org.el ends here
