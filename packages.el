@@ -71,3 +71,7 @@
 
 (package! org-bars
   :recipe (:host github :repo "tonyaldon/org-bars"))
+
+(package! org-roam-ui)
+
+(package! org-html-themify :recipe (:host github :repo "DogLooksGood/org-html-themify" :files ("*.el" "*.js" "*.css")))

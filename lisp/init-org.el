@@ -32,5 +32,50 @@
          :unnarrowed t)))
   )
 
+(defun my/wrap-with-char (char)
+  "Wrap the word at point or the selected region with CHAR for org-mode emphasis."
+  (interactive "cEnter character to wrap with: ")
+  (save-excursion
+    (if (use-region-p)
+        ;; Wrap the selected region
+        (let ((start (region-beginning))
+              (end (region-end)))
+          (goto-char start)
+          (insert char)
+          (goto-char (+ end 1))
+          (insert char))
+      ;; Wrap the word at point
+      (let ((bounds (bounds-of-thing-at-point 'word)))
+        (when bounds
+          (let ((start (car bounds))
+                (end (cdr bounds)))
+            (goto-char start)
+            (insert char)
+            (goto-char (1+ end))
+            (insert char)))))))
+
+(use-package org-html-themify
+  :hook (org-mode . org-html-themify-mode)
+  :custom
+  (org-html-themify-themes
+   '((light . doom-nord-light)
+     (dark . doom-vibrant)))
+  )
+
+(use-package! websocket
+    :after org-roam)
+
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
 (provide 'init-org)
 ;;; init-org.el ends here
