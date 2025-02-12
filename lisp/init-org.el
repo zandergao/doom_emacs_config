@@ -1,6 +1,5 @@
 ;;; lisp/init-org.el -*- lexical-binding: t; -*-
 
-(add-hook 'org-mode-hook #'org-num-mode)
 (require 'org-bars)
 (add-hook 'org-mode-hook #'org-bars-mode)
 
@@ -10,9 +9,7 @@
   ;; 启用自动显示图片
   (setq org-startup-with-inline-images t)
   (add-hook 'org-mode-hook #'org-display-inline-images)
-  ;; 在 Source Block 中像在语言 mode 中一样的缩进
-  (setq org-src-tab-acts-natively t)
-  (setq org-src-preserve-indentation nil)
+  (add-hook 'org-mode-hook #'org-num-mode)
   )
 
 (use-package! pangu-spacing
@@ -24,7 +21,7 @@
 
 (use-package! org-roam
   :config
-  (setq org-roam-directory "/home/gaozhan/org/roam")
+  (setq org-roam-directory "/mnt/d/JGcloud/Nutstore/org/roam")
   (setq org-roam-capture-templates
       '(("d" "default" plain "%?"
          :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"

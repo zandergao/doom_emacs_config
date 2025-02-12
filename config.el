@@ -32,7 +32,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-vibrant)
+(setq doom-theme 'leuven)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -40,7 +40,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory "/mnt/d/JGcloud/Nutstore/org/")
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
@@ -80,8 +80,9 @@
       user-mail-address "gaozhanwk@163.com")
 
 (global-unset-key (kbd "C-z")) ; 关闭 "C-z" 最小化
-(global-auto-revert-mode 1) ; 自动加载外部修改过的文件
-(setq auto-revert-remote-files t) ; 启用对远程文件的自动检测
+;;(global-auto-revert-mode 1) ; 自动加载外部修改过的文件
+;;(setq auto-revert-remote-files t) ; 启用对远程文件的自动检测
+(setq tramp-use-ssh-controlmaster-options nil)
 (setq auto-save-default t) ; 自动保存文件
 (setq make-backup-files nil) ; 禁用备份文件
 
