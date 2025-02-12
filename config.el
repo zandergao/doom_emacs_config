@@ -93,6 +93,9 @@
 (setq read-file-name-completion-ignore-case t) ; 读取文件名时，忽略大小写进行补全
 (setq read-buffer-completion-ignore-case t) ; buffer 忽略大小写进行补全
 
+;; rust
+(setq rustic-cargo-bin "/home/gaozhan/.cargo/bin/cargo")
+
 (use-package! color-rg
   :config
   (defun my/rg-search-in-directory ()
