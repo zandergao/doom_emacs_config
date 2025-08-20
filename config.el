@@ -82,14 +82,9 @@
 (global-unset-key (kbd "C-z")) ; 关闭 "C-z" 最小化
 ;;(global-auto-revert-mode 1) ; 自动加载外部修改过的文件
 ;;(setq auto-revert-remote-files t) ; 启用对远程文件的自动检测
-(setq tramp-use-ssh-controlmaster-options nil)
 (setq auto-save-default t) ; 自动保存文件
 (setq make-backup-files nil) ; 禁用备份文件
 
-(setq tramp-chunksize 2000) ; 增大数据块大小，加快传输速度
-(with-eval-after-load 'tramp
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path) ; 使用远程主机的默认 PATH
-  (add-to-list 'tramp-remote-path "/home/gaozhan/.local/bin")) ; 添加自定义路径
 
 (setq read-file-name-completion-ignore-case t) ; 读取文件名时，忽略大小写进行补全
 (setq read-buffer-completion-ignore-case t) ; buffer 忽略大小写进行补全
@@ -118,3 +113,4 @@
 (use-package init-keybinding)
 (use-package init-sdcv)
 (use-package my-fun)
+(use-package init-tramp)
