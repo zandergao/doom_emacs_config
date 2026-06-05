@@ -42,10 +42,6 @@
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
-(use-package! dts-mode
-  :mode (("\\.dts\\'" . dts-mode)
-         ("\\.dtsi\\'" . dts-mode)))
-
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `with-eval-after-load' block, otherwise Doom's defaults may override your
 ;; settings. E.g.
@@ -76,5 +72,15 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+(use-package! dts-mode
+  :mode (("\\.dts\\'" . dts-mode)
+         ("\\.dtsi\\'" . dts-mode)))
+
+;; personal information
+(setq user-full-name "gaozhan"
+      user-mail-address "gaozhanwk@163.com")
+
+(setq make-backup-files nil) ; 禁用备份文件
 
 (load! "lisp/init-ui")
