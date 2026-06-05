@@ -56,3 +56,7 @@
 (package! dts-mode)
 (package! nyan-mode)
 (package! cnfonts)
+(package! holo-layer
+  :recipe (:host github
+           :repo "manateelazycat/holo-layer"
+           :files ("*.el" "*.py" "resources" "icon_cache" "plugin")))

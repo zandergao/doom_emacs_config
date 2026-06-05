@@ -22,3 +22,11 @@
 ;;; Chinese fonts
 (when (require 'cnfonts nil t)
   (cnfonts-enable))
+
+;;; HoloLayer cursor effect
+(when (require 'holo-layer nil t)
+  (setq holo-layer-enable-cursor-animation t
+        holo-layer-enable-type-animation nil
+        holo-layer-enable-indent-rainbow nil
+        holo-layer-enable-window-border nil)
+  (holo-layer-enable))
