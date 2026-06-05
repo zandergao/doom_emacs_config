@@ -14,6 +14,8 @@
 ;; (package! some-package)
 
 (package! dts-mode)
+(package! nyan-mode)
+(package! cnfonts)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
