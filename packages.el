@@ -60,3 +60,5 @@
   :recipe (:host github
            :repo "manateelazycat/holo-layer"
            :files ("*.el" "*.py" "resources" "icon_cache" "plugin")))
+(package! sdcv
+  :recipe (:host github :repo "manateelazycat/sdcv"))
