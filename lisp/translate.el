@@ -1,6 +1,31 @@
-;;; translate.el -*- lexical-binding: t; -*-
+;;; translate.el --- offline dict + local Ollama translation -*- lexical-binding: t; -*-
+;;
+;; 换电脑后：git clone 本仓库到 ~/.doom.d，然后按下面做一次（或 M-x +trans/doctor）。
+;;
+;; 1) Doom
+;;    doom sync && doom doctor
+;;
+;; 2) 离线词典 SPC s w
+;;    brew install sdcv          # Linux: apt/dnf install sdcv
+;;    # 朗道英汉/汉英 5.0 已放在仓库 share/stardict/，clone 后即可用
+;;
+;; 3) 句/段/整文件翻译 SPC y s / y p / y f
+;;    brew install ollama python3
+;;    ollama serve               # 本机 127.0.0.1:11434
+;;    ollama pull qwen2.5-coder:7b
+;;    # 整文件翻译还要用 bin/trans-worker.py（已随仓库），需要 python3
+;;    # Ollama 不可用时，句/段会回退到 Google（需要外网）
+;;
+;; 快捷键：SPC s w 查词；SPC y s 句；SPC y p 段；SPC y f 整文件；
+;;         SPC y q 取消整文件；SPC y e 中译英替换；SPC y d 检查环境
+;;
+;;; Code:
 
-(defvar +trans-dict-dir (expand-file-name "~/.stardict/dic")
+(defvar +trans-dict-dir
+  (expand-file-name
+   "share/stardict"
+   (or (bound-and-true-p doom-user-dir)
+       (expand-file-name "~/.doom.d")))
   "Directory of local StarDict dictionaries used by sdcv.")
 
 (defvar +trans-ollama-url "http://127.0.0.1:11434/api/chat"
@@ -94,7 +119,8 @@
        :desc "Translate paragraph" "p" #'+trans/translate-paragraph
        :desc "Translate buffer" "f" #'+trans/translate-buffer
        :desc "Cancel buffer translation" "q" #'+trans/translate-buffer-cancel
-       :desc "Chinese to English" "e" #'+trans/zh-to-en))
+       :desc "Chinese to English" "e" #'+trans/zh-to-en
+       :desc "Check translation setup" "d" #'+trans/doctor))
 
 (defun +trans--format-float-text (raw)
   "Strip sdcv markers from RAW for a compact floating tooltip."
@@ -1180,6 +1206,68 @@ If PAYLOAD is a string, send it as a JSON POST body."
     (if (and (display-graphic-p) (require 'posframe nil t))
         (+trans--show-float-text text)
       (message (if dst-first "译文: %s" "%s") dst))))
+
+(defun +trans--doctor-dict-names ()
+  "Return bookname values from StarDict .ifo files."
+  (let (names)
+    (when (file-directory-p +trans-dict-dir)
+      (dolist (ifo (directory-files-recursively +trans-dict-dir "\\.ifo\\'"))
+        (with-temp-buffer
+          (insert-file-contents ifo)
+          (when (re-search-forward "^bookname=\\(.*\\)$" nil t)
+            (push (string-trim (match-string 1)) names)))))
+    (nreverse names)))
+
+(defun +trans--doctor-ollama-p ()
+  "Return non-nil if the local Ollama chat endpoint answers."
+  (require 'url)
+  (let ((url (replace-regexp-in-string "/api/chat\\'" "/api/tags" +trans-ollama-url)))
+    (ignore-errors
+      (with-current-buffer (url-retrieve-synchronously url t t 3)
+        (goto-char (point-min))
+        (and (re-search-forward "\n\n" nil t) t)))))
+
+(defun +trans/doctor ()
+  "Check tools this module needs. Run after moving to a new machine."
+  (interactive)
+  (let* ((sdcv (executable-find "sdcv"))
+         (py (executable-find "python3"))
+         (worker (and (stringp +trans-worker-program)
+                      (file-readable-p +trans-worker-program)))
+         (dict-dir (file-directory-p +trans-dict-dir))
+         (books (+trans--doctor-dict-names))
+         (need '("朗道英汉字典5.0" "朗道汉英字典5.0"))
+         (missing (delq nil
+                        (mapcar (lambda (n) (unless (member n books) n)) need)))
+         (ollama-bin (executable-find "ollama"))
+         (ollama-up (+trans--doctor-ollama-p))
+         (lines
+          (list
+           "翻译环境检查（换电脑后跑一次）"
+           ""
+           (if sdcv (format "OK  sdcv  %s" sdcv) "缺  sdcv  →  brew install sdcv")
+           (if dict-dir
+               (format "OK  词典目录  %s" +trans-dict-dir)
+             (format "缺  词典目录  %s  →  确认仓库里有 share/stardict" +trans-dict-dir))
+           (if (null missing)
+               (format "OK  朗道词典  %s" (string-join books " / "))
+             (format "缺  词典  %s  →  检查 share/stardict 是否完整"
+                     (string-join missing "、")))
+           (if py (format "OK  python3  %s" py) "缺  python3  →  brew install python3")
+           (if worker
+               (format "OK  worker  %s" +trans-worker-program)
+             (format "缺  worker  %s" +trans-worker-program))
+           (if ollama-bin
+               (format "OK  ollama  %s" ollama-bin)
+             "缺  ollama  →  brew install ollama && ollama pull qwen2.5-coder:7b")
+           (if ollama-up
+               (format "OK  Ollama 服务  %s  模型 %s"
+                       +trans-ollama-url +trans-ollama-model)
+             (format "缺  Ollama 服务  →  ollama serve && ollama pull %s"
+                     +trans-ollama-model))
+           ""
+           "快捷键  SPC s w 查词  SPC y s 句  SPC y p 段  SPC y f 整文件  SPC y q 取消  SPC y e 中译英")))
+    (+trans--show-result-buffer (string-join lines "\n") "翻译环境检查")))
 
 (defun +trans/translate-sentence (&optional arg)
   "Translate the selected region or the sentence at point."

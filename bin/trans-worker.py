@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Translate batched text via local Ollama. Runs outside Emacs."""
+"""Translate batched text via local Ollama. Runs outside Emacs.
+
+New machine: see the header of lisp/translate.el, then M-x +trans/doctor.
+Needs python3 and a local Ollama at the URL passed in the input JSON.
+"""
 
 import json
 import re
