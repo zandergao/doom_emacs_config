@@ -1,4 +1,4 @@
-;;; init-translate.el -*- lexical-binding: t; -*-
+;;; translate.el -*- lexical-binding: t; -*-
 
 (defvar +trans-dict-dir (expand-file-name "~/.stardict/dic")
   "Directory of local StarDict dictionaries used by sdcv.")
@@ -29,11 +29,14 @@
   :config
   (set-popup-rule! "^\\*SDCV\\*" :side 'right :size 0.38 :select t :quit t))
 
+(set-popup-rule! "^\\*Translate\\*" :side 'right :size 0.5 :select t :quit t)
+
 (map! :leader
       (:desc "Search word (offline dict)" "s w" #'+trans/search-word)
       (:prefix ("y" . "translate")
        :desc "Translate sentence" "s" #'+trans/translate-sentence
        :desc "Translate paragraph" "p" #'+trans/translate-paragraph
+       :desc "Translate buffer" "f" #'+trans/translate-buffer
        :desc "Chinese to English" "e" #'+trans/zh-to-en))
 
 (defun +trans--format-float-text (raw)
@@ -506,3 +509,51 @@ Chinese and insert the English at point."
         (when (use-region-p)
           (deactivate-mark))
         (message "%s" result)))))
+
+(defun +trans--split-paragraphs (text)
+  "Split TEXT into paragraphs separated by blank lines."
+  (split-string text "\n[ \t]*\n+" t "[ \t\n\r]+"))
+
+(defun +trans--show-result-buffer (text &optional title)
+  "Show TEXT in a normal *Translate* buffer, not a float."
+  (let ((buf (get-buffer-create "*Translate*")))
+    (with-current-buffer buf
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert text)
+        (goto-char (point-min)))
+      (text-mode)
+      (setq-local header-line-format (or title "译文")))
+    (pop-to-buffer buf)))
+
+(defun +trans/translate-buffer ()
+  "Translate the current buffer and show the result in a side buffer.
+The original file is left unchanged.  Long text is translated
+paragraph by paragraph.  Confirm before translating source code
+or very large buffers."
+  (interactive)
+  (let ((text (string-trim (buffer-substring-no-properties (point-min) (point-max))))
+        (src (or (and buffer-file-name (file-name-nondirectory buffer-file-name))
+                 (buffer-name))))
+    (when (string-empty-p text)
+      (user-error "当前文件没有可翻译的内容"))
+    (when (and (derived-mode-p 'prog-mode)
+               (not (y-or-n-p "当前是代码文件，整文件翻译可能把代码也译掉。继续？")))
+      (user-error "已取消"))
+    (when (and (> (length text) 8000)
+               (not (y-or-n-p (format "文本约 %d 字，翻译会较久。继续？" (length text)))))
+      (user-error "已取消"))
+    (let* ((parts (+trans--split-paragraphs text))
+           (total (max 1 (length parts)))
+           (i 0)
+           translated)
+      (dolist (part (or parts (list text)))
+        (setq i (1+ i))
+        (message "正在翻译整文件 %d/%d..." i total)
+        (redisplay t)
+        (push (+trans--translate-text part) translated))
+      (+trans--show-result-buffer
+       (string-join (nreverse translated) "\n\n")
+       (format "译文 · %s" src))
+      (message "整文件翻译完成（%d 段）" total))))
+

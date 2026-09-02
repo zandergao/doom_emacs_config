@@ -84,4 +84,4 @@
 (setq make-backup-files nil) ; 禁用备份文件
 
 (load! "lisp/init-ui")
-(load! "lisp/init-translate")
+(load! "lisp/translate")
