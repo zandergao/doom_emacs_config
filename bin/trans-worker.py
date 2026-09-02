@@ -53,33 +53,31 @@ def tag_note(text):
     return ""
 
 
-def translate_cores(url, model, timeout, cores, target):
-    note = tag_note("".join(cores))
-    if len(cores) == 1:
-        prompt = (
-            "将下面文本翻译成%s。只输出译文，不要解释，不要引号。%s\n%s"
-            % (target, note, cores[0])
-        )
-        return [chat(url, model, prompt, timeout)]
-    body = "\n".join("%d||%s" % (i, c) for i, c in enumerate(cores, 1))
-    prompt = (
-        "将下面编号片段分别翻译成%s。每条格式必须是 数字||译文 ，不要解释，不要改编号。%s\n%s"
-        % (target, note, body)
+def prompt_one(target, text):
+    return "将下面文本翻译成%s。只输出译文，不要解释，不要引号。%s\n%s" % (
+        target,
+        tag_note(text),
+        text,
     )
-    raw = chat(url, model, prompt, timeout)
-    parsed = parse_batch(raw, len(cores))
+
+
+def prompt_batch(target, cores):
+    body = "\n".join("%d||%s" % (i, c) for i, c in enumerate(cores, 1))
+    return (
+        "将下面编号片段分别翻译成%s。每条格式必须是 数字||译文 ，不要解释，不要改编号。%s\n%s"
+        % (target, tag_note(body), body)
+    )
+
+
+def translate_cores(url, model, timeout, cores, target):
+    if len(cores) == 1:
+        return [chat(url, model, prompt_one(target, cores[0]), timeout)]
+    parsed = parse_batch(
+        chat(url, model, prompt_batch(target, cores), timeout), len(cores)
+    )
     if parsed:
         return parsed
-    return [
-        chat(
-            url,
-            model,
-            "将下面文本翻译成%s。只输出译文，不要解释，不要引号。%s\n%s"
-            % (target, tag_note(core), core),
-            timeout,
-        )
-        for core in cores
-    ]
+    return [chat(url, model, prompt_one(target, core), timeout) for core in cores]
 
 
 def main():
